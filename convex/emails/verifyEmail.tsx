@@ -1,12 +1,12 @@
-import { Heading, Link, Text } from "@react-email/components";
-import React from "react";
-import { BaseEmail, styles } from "./components/BaseEmail";
+import { Heading, Link, Text } from '@react-email/components'
+import React from 'react'
+import { BaseEmail, styles } from './components/BaseEmail'
 
 interface VerifyEmailProps {
-  url: string;
-  brandName?: string;
-  brandTagline?: string;
-  brandLogoUrl?: string;
+  url: string
+  brandName?: string
+  brandTagline?: string
+  brandLogoUrl?: string
 }
 
 export default function VerifyEmail({
@@ -28,8 +28,8 @@ export default function VerifyEmail({
         target="_blank"
         style={{
           ...styles.link,
-          display: "block",
-          marginBottom: "16px",
+          display: 'block',
+          marginBottom: '16px',
         }}
       >
         Click here to verify your email address
@@ -37,13 +37,13 @@ export default function VerifyEmail({
       <Text
         style={{
           ...styles.text,
-          color: "#ababab",
-          marginTop: "14px",
-          marginBottom: "16px",
+          color: '#ababab',
+          marginTop: '14px',
+          marginBottom: '16px',
         }}
       >
         If you didn&apos;t create an account, you can safely ignore this email.
       </Text>
     </BaseEmail>
-  );
+  )
 }

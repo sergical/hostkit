@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { Button } from '@/components/ui/button'
+import { LogOut } from 'lucide-react'
 
 export function SignOutButton({ onClick }: { onClick: () => any }) {
   return (
@@ -7,5 +7,5 @@ export function SignOutButton({ onClick }: { onClick: () => any }) {
       <LogOut size={16} className="mr-2" />
       Sign out
     </Button>
-  );
+  )
 }

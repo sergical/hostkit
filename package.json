@@ -10,6 +10,7 @@
     "dev:db": "npx convex dev",
     "build": "vite build",
     "generate": "convex dev --once",
+    "check-types": "tsc --noEmit",
     "start": "node .output/server/index.mjs",
     "lint": "prettier --check '**/*' --ignore-unknown && eslint --ext .ts,.tsx ./app",
     "format": "prettier --write '**/*' --ignore-unknown",
