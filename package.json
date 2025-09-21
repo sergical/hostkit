@@ -13,7 +13,7 @@
     "start": "node .output/server/index.mjs",
     "lint": "prettier --check '**/*' --ignore-unknown && eslint --ext .ts,.tsx ./app",
     "format": "prettier --write '**/*' --ignore-unknown",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types --env-interface Env"
   },
   "dependencies": {
