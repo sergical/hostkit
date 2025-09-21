@@ -1,10 +1,12 @@
 import {
+  HeadContent,
   Outlet,
   createRootRouteWithContext,
   useRouteContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { Meta, Scripts, createServerFn } from '@tanstack/react-start'
+import { createServerFn } from '@tanstack/react-start'
+import { Scripts } from '@tanstack/react-router'
 import { QueryClient } from '@tanstack/react-query'
 import * as React from 'react'
 import appCss from '@/styles/app.css?url'
@@ -18,6 +20,9 @@ import { getCookie, getWebRequest } from '@tanstack/react-start/server'
 import { seo } from '@/utils/seo'
 import { ConvexQueryClient } from '@convex-dev/react-query'
 import { wrapCreateRootRouteWithSentry } from '@sentry/tanstackstart-react'
+import { ThemeProvider, useTheme } from '@/components/theme-provider'
+import { getThemeServerFn } from '@/lib/theme'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 
 // Get auth information for SSR using available cookies
 const fetchAuth = createServerFn({ method: 'GET' }).handler(async () => {
@@ -70,31 +75,71 @@ export const Route = wrapCreateRootRouteWithSentry(
       }
     },
     component: RootComponent,
+    loader: () => getThemeServerFn(),
   }),
 )
 
 function RootComponent() {
   const context = useRouteContext({ from: Route.id })
+  const data = Route.useLoaderData()
+
   return (
     <ConvexBetterAuthProvider
       client={context.convexQueryClient.convexClient}
       authClient={authClient}
     >
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
+      <ThemeProvider theme={data}>
+        <RootDocument>
+          <Outlet />
+        </RootDocument>
+      </ThemeProvider>
     </ConvexBetterAuthProvider>
   )
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const { theme, setTheme } = useTheme()
   return (
-    <html lang="en" className="dark">
+    <html suppressHydrationWarning lang="en">
       <head>
-        <Meta />
+        <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+(function() {
+  try {
+    // Get theme from cookie
+    const cookieValue = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('ui-theme='))
+      ?.split('=')[1] || 'system';
+    
+    const root = document.documentElement;
+    root.classList.remove('light', 'dark');
+    
+    if (cookieValue === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches 
+        ? 'dark' 
+        : 'light';
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(cookieValue);
+    }
+  } catch (e) {
+    // Fallback to light theme if anything goes wrong
+    document.documentElement.classList.add('light');
+  }
+})();
+            `,
+          }}
+        />
       </head>
-      <body className="bg-neutral-950 text-neutral-50">
+      <body className="bg-background text-foreground">
+        <div className="absolute top-4 right-4 z-50">
+          <ThemeSwitcher value={theme} onChange={setTheme} />
+        </div>
         {children}
+
         <TanStackRouterDevtools position="bottom-right" />
         <Scripts />
       </body>

@@ -53,7 +53,7 @@ export default function SignUp() {
         },
         onSuccess: async () => {
           setLoading(false)
-          await navigate({ to: '/client-only' })
+          await navigate({ to: '/dashboard' })
         },
         onError: async (ctx) => {
           setLoading(false)

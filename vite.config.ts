@@ -11,6 +11,7 @@ export default defineConfig({
     }),
     // tailwindcss(), sentry(), ...
     tanstackStart({
+      target: 'cloudflare-module',
       /** Add your options here */
       customViteReactPlugin: true,
     }),
