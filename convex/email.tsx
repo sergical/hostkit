@@ -25,7 +25,7 @@ const sendEmail = async (
   },
 ) => {
   await resend.sendEmail(ctx, {
-    from: 'Test <onboarding@hostk.it.com>',
+    from: 'HostKit <onboarding@hostk.it.com>',
     to,
     subject,
     html,
