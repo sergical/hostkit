@@ -11,8 +11,8 @@ export default defineConfig({
       projects: ['./tsconfig.json'],
     }),
     tanstackStart({
-      customViteReactPlugin: true,
       target: 'cloudflare-module',
+      customViteReactPlugin: true,
     }),
     react(),
     sentryVitePlugin({
