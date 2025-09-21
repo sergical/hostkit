@@ -17,6 +17,7 @@ import {
 import { getCookie, getWebRequest } from '@tanstack/react-start/server'
 import { seo } from '@/utils/seo'
 import { ConvexQueryClient } from '@convex-dev/react-query'
+import { wrapCreateRootRouteWithSentry } from '@sentry/tanstackstart-react'
 
 // Get auth information for SSR using available cookies
 const fetchAuth = createServerFn({ method: 'GET' }).handler(async () => {
@@ -30,45 +31,47 @@ const fetchAuth = createServerFn({ method: 'GET' }).handler(async () => {
   }
 })
 
-export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient
-  convexQueryClient: ConvexQueryClient
-}>()({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      ...seo({
-        title: 'Convex + Better Auth + TanStack Start',
-        description: `Convex + Better Auth + TanStack Start`,
-      }),
-    ],
-    links: [
-      { rel: 'stylesheet', href: appCss },
-      { rel: 'icon', href: '/favicon.ico' },
-    ],
+export const Route = wrapCreateRootRouteWithSentry(
+  createRootRouteWithContext<{
+    queryClient: QueryClient
+    convexQueryClient: ConvexQueryClient
+  }>()({
+    head: () => ({
+      meta: [
+        {
+          charSet: 'utf-8',
+        },
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1',
+        },
+        ...seo({
+          title: 'Convex + Better Auth + TanStack Start',
+          description: `Convex + Better Auth + TanStack Start`,
+        }),
+      ],
+      links: [
+        { rel: 'stylesheet', href: appCss },
+        { rel: 'icon', href: '/favicon.ico' },
+      ],
+    }),
+    beforeLoad: async (ctx) => {
+      const { userId, token } = await fetchAuth()
+
+      // During SSR only (the only time serverHttpClient exists),
+      // set the auth token to make HTTP queries with.
+      if (token) {
+        ctx.context.convexQueryClient.serverHttpClient?.setAuth(token)
+      }
+
+      return {
+        userId,
+        token,
+      }
+    },
+    component: RootComponent,
   }),
-  beforeLoad: async (ctx) => {
-    const { userId, token } = await fetchAuth()
-
-    // During SSR only (the only time serverHttpClient exists),
-    // set the auth token to make HTTP queries with.
-    if (token) {
-      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token)
-    }
-
-    return {
-      userId,
-      token,
-    }
-  },
-  component: RootComponent,
-})
+)
 
 function RootComponent() {
   const context = useRouteContext({ from: Route.id })
