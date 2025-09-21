@@ -1,11 +1,11 @@
+"$schema" = "node_modules/wrangler/config-schema.json"
 name = "hostkit"
-main = "./.output/server/index.mjs"
-compatibility_date = "2025-04-01"
-compatibility_flags = ["nodejs_compat"]
+main = ".output/server/index.mjs"
+compatibility_date = "2025-09-20"
+compatibility_flags = [ "nodejs_compat" ]
 
 [assets]
-binding = "ASSETS"
-directory = "./.output/public"
+directory = ".output/public"
 
-[observability.logs]
+[observability]
 enabled = true
