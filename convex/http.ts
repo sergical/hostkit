@@ -33,6 +33,32 @@ http.route({
   }),
 })
 
+// Webhook for Gemini to call to confirm attendee
+http.route({
+  path: '/confirm-attendee',
+  method: 'POST',
+  handler: httpAction(async (ctx, request) => {
+    const { phoneNumber, eventId } = await request.json()
+
+    if (!phoneNumber || !eventId) {
+      return new Response(JSON.stringify({ error: 'Missing phoneNumber or eventId' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    const result = await ctx.runMutation(api.events.confirmAttendee, {
+      phoneNumber,
+      eventId: eventId as Id<'events'>,
+    })
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }),
+})
+
 // Webhook for Gemini to call to remove attendee
 http.route({
   path: '/remove-attendee',

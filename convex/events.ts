@@ -31,6 +31,40 @@ export const addAttendee = mutation({
   },
 })
 
+// Confirm attendee for event (called by Gemini tool)
+export const confirmAttendee = mutation({
+  args: {
+    phoneNumber: v.string(),
+    eventId: v.id('events'),
+  },
+  returns: v.object({
+    success: v.boolean(),
+    message: v.string(),
+  }),
+  handler: async (ctx, args) => {
+    const attendee = await ctx.db
+      .query('attendees')
+      .withIndex('by_phone_and_event', (q) =>
+        q.eq('phoneNumber', args.phoneNumber).eq('eventId', args.eventId)
+      )
+      .first()
+
+    if (!attendee) {
+      return {
+        success: false,
+        message: 'Attendee not found',
+      }
+    }
+
+    await ctx.db.patch(attendee._id, { status: 'confirmed' })
+
+    return {
+      success: true,
+      message: 'Attendee confirmed for event',
+    }
+  },
+})
+
 // Remove attendee from event (called by Gemini tool)
 export const removeAttendee = mutation({
   args: {

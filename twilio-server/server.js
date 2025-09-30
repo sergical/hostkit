@@ -169,23 +169,22 @@ Event Details:
 Your task:
 1. Greet ${eventInfo.attendeeName} warmly by name
 2. Ask if they are still interested in attending "${eventInfo.eventName}" on ${eventDate}
-3. IMPORTANT: If they say NO or want to cancel, you MUST immediately call the remove_attendee function BEFORE responding
-4. If they say YES, thank them and confirm their attendance
-5. Keep the conversation brief and natural (under 30 seconds)
+3. If they say YES or confirm attendance: Call the confirm_attendee function, then say thanks and goodbye
+4. If they say NO or want to cancel: Call the remove_attendee function, then acknowledge their cancellation and say goodbye
 
-CRITICAL: Always call the remove_attendee function when someone wants to cancel. Do not just say you will remove them - actually call the function.
+CRITICAL: Always call the appropriate function based on their response. Call confirm_attendee for YES, remove_attendee for NO. After calling the function and responding, END THE CALL.
 
-Be conversational, friendly, and understanding.`,
+Keep the conversation brief and natural (under 30 seconds). Be conversational, friendly, and understanding.`,
               tools: [
                 {
                   functionDeclarations: [
                     {
+                      name: 'confirm_attendee',
+                      description: 'Confirm the current attendee for the event when they say YES or confirm they want to attend',
+                    },
+                    {
                       name: 'remove_attendee',
-                      description: 'Remove the current attendee from the event when they confirm they do not want to attend',
-                      parameters: {
-                        type: 'object',
-                        properties: {},
-                      },
+                      description: 'Remove the current attendee from the event when they say NO or confirm they do not want to attend',
                     },
                   ],
                 },
@@ -201,12 +200,37 @@ Be conversational, friendly, and understanding.`,
                   console.log('[GEMINI] Tool call:', message.toolCall.functionCalls)
 
                   for (const fnCall of message.toolCall.functionCalls) {
-                    if (fnCall.name === 'remove_attendee') {
+                    const convexSiteUrl = process.env.VITE_CONVEX_SITE_URL || 'https://outstanding-bison-162.convex.site'
+
+                    if (fnCall.name === 'confirm_attendee') {
+                      console.log('[TOOL] Confirming attendee:', { phoneNumber, eventId })
+
+                      try {
+                        const response = await fetch(`${convexSiteUrl}/confirm-attendee`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ phoneNumber, eventId }),
+                        })
+
+                        const result = await response.json()
+                        console.log('[TOOL] Result:', result)
+
+                        session.sendToolResponse({
+                          functionResponses: [
+                            {
+                              id: fnCall.id,
+                              name: fnCall.name,
+                              response: result,
+                            },
+                          ],
+                        })
+                      } catch (error) {
+                        console.error('[TOOL] Error:', error)
+                      }
+                    } else if (fnCall.name === 'remove_attendee') {
                       console.log('[TOOL] Removing attendee:', { phoneNumber, eventId })
 
                       try {
-                        // Call Convex HTTP endpoint with context values
-                        const convexSiteUrl = process.env.VITE_CONVEX_SITE_URL || 'https://outstanding-bison-162.convex.site'
                         const response = await fetch(`${convexSiteUrl}/remove-attendee`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
@@ -216,7 +240,6 @@ Be conversational, friendly, and understanding.`,
                         const result = await response.json()
                         console.log('[TOOL] Result:', result)
 
-                        // Send tool response back to Gemini
                         session.sendToolResponse({
                           functionResponses: [
                             {
