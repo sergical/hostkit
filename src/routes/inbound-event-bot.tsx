@@ -1,9 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import ResetPassword from '@/components/ResetPassword'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/inbound-event-bot')({
-    component: RouteComponent,
+  component: ResetPassword
 })
-
-function RouteComponent() {
-    return <div>Hello "/inbound-event-bot"!</div>
-}

@@ -5,17 +5,23 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently -r npm:dev:web npm:dev:db",
+    "dev": "concurrently -r npm:dev:web npm:dev:db npm:dev:voice",
     "dev:web": "vite dev --port 3000",
     "dev:db": "npx convex dev",
+    "dev:voice": "cd voice-agent && npm run dev",
     "build": "vite build",
+    "build:all": "npm run build && cd voice-agent && npm install --production",
     "generate": "convex dev --once",
     "check-types": "tsc --noEmit",
-    "start": "node .output/server/index.mjs",
+    "start": "concurrently npm:start:web npm:start:voice",
+    "start:web": "node .output/server/index.mjs",
+    "start:voice": "cd voice-agent && npm start",
     "lint": "prettier --check '**/*' --ignore-unknown && eslint --ext .ts,.tsx ./app",
     "format": "prettier --write '**/*' --ignore-unknown",
     "deploy": "wrangler deploy",
-    "cf-typegen": "wrangler types --env-interface Env"
+    "cf-typegen": "wrangler types --env-interface Env",
+    "voice:install": "cd voice-agent && npm install",
+    "voice:start": "cd voice-agent && npm start"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.8.6",

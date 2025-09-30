@@ -1,0 +1,28 @@
+{
+  "name": "hostkit-voice-agent",
+  "version": "1.0.0",
+  "description": "WebSocket bridge between Twilio and Gemini Live API",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "twilio",
+    "gemini",
+    "websocket",
+    "voice",
+    "ai"
+  ],
+  "dependencies": {
+    "@google-cloud/vertexai": "^1.10.0",
+    "convex": "^1.27.1",
+    "dotenv": "^16.5.0",
+    "express": "^4.18.2",
+    "ws": "^8.16.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

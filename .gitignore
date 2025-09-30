@@ -26,3 +26,10 @@ yarn.lock
 .env
 
 .env.local
+
+# Voice Agent
+voice-agent/.env
+voice-agent/service-account.json
+voice-agent/*.json
+!voice-agent/package.json
+!voice-agent/package-lock.json
