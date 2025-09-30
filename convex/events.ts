@@ -65,6 +65,18 @@ export const confirmAttendee = mutation({
   },
 })
 
+// Reset attendee to pending
+export const resetAttendeeToPending = mutation({
+  args: {
+    attendeeId: v.id('attendees'),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.attendeeId, { status: 'pending' })
+    return null
+  },
+})
+
 // Remove attendee from event (called by Gemini tool)
 export const removeAttendee = mutation({
   args: {

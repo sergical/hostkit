@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
-import { useAction } from 'convex/react'
+import { useAction, useMutation } from 'convex/react'
 import { api } from '@convex/_generated/api'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { Phone } from 'lucide-react'
+import { Phone, Plus, RotateCcw } from 'lucide-react'
 
 export function CallManager() {
   const { data: events = [] } = useQuery(convexQuery(api.events.listEvents, {}))
@@ -74,6 +75,35 @@ function EventSection({
     ...convexQuery(api.events.getEventWithAttendees, { eventId: event._id }),
     enabled: !!event._id,
   })
+  const addAttendee = useMutation(api.events.addAttendee)
+  const resetToPending = useMutation(api.events.resetAttendeeToPending)
+  const [name, setName] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [isAdding, setIsAdding] = useState(false)
+
+  const handleAddAttendee = async () => {
+    if (!name || !phoneNumber) {
+      toast.error('Please enter name and phone number')
+      return
+    }
+
+    setIsAdding(true)
+    try {
+      await addAttendee({
+        eventId: event._id,
+        name,
+        phoneNumber,
+      })
+      toast.success('Attendee added')
+      setName('')
+      setPhoneNumber('')
+    } catch (error) {
+      toast.error('Failed to add attendee')
+      console.error(error)
+    } finally {
+      setIsAdding(false)
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -83,6 +113,26 @@ function EventSection({
         <p className="text-xs text-muted-foreground mt-1">
           {new Date(event.date).toLocaleDateString()} • {event.location}
         </p>
+      </div>
+
+      <div className="rounded-lg border p-4 space-y-3">
+        <h4 className="text-sm font-medium">Add Attendee</h4>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Input
+            placeholder="Phone number"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+          <Button onClick={handleAddAttendee} disabled={isAdding}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add
+          </Button>
+        </div>
       </div>
 
       {eventDetails && eventDetails.attendees.length > 0 && (
@@ -111,16 +161,28 @@ function EventSection({
                   </div>
                   <p className="text-sm text-muted-foreground">{attendee.phoneNumber}</p>
                 </div>
-                {attendee.status === 'pending' && (
-                  <Button
-                    size="sm"
-                    onClick={() => onCall(attendee.phoneNumber, event._id)}
-                    disabled={callingPhone === attendee.phoneNumber}
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    {callingPhone === attendee.phoneNumber ? 'Calling...' : 'Call'}
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {attendee.status === 'pending' && (
+                    <Button
+                      size="sm"
+                      onClick={() => onCall(attendee.phoneNumber, event._id)}
+                      disabled={callingPhone === attendee.phoneNumber}
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      {callingPhone === attendee.phoneNumber ? 'Calling...' : 'Call'}
+                    </Button>
+                  )}
+                  {attendee.status !== 'pending' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => resetToPending({ attendeeId: attendee._id })}
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Reset
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

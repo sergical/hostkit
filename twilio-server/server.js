@@ -158,7 +158,6 @@ wss.on('connection', async (ws) => {
             model: 'gemini-2.5-flash-native-audio-preview-09-2025',
             config: {
               responseModalities: [Modality.AUDIO],
-              automaticFunctionCalling: true,
               systemInstruction: `You are calling ${eventInfo.attendeeName} to confirm attendance for an event.
 
 Event Details:
