@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/sidebar'
 import { TodoList } from '@/components/TodoListServer'
 import { Toaster } from 'sonner'
+import { QrCodeDisplay } from '@/components/QrCode'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export const Route = createFileRoute('/_authed/dashboard')({
   component: DashboardComponent,
@@ -54,9 +56,17 @@ function DashboardComponent() {
             <div className="bg-muted/50 aspect-video rounded-xl flex items-center justify-center">
               <span className="text-muted-foreground">Reports</span>
             </div>
-            <div className="bg-muted/50 aspect-video rounded-xl flex items-center justify-center">
-              <span className="text-muted-foreground">Metrics</span>
-            </div>
+            <Card className="bg-muted/50 border-0">
+              <CardHeader>
+                <CardTitle className="text-base">Share Dashboard</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center gap-2">
+                <QrCodeDisplay to="/dashboard" size={120} className="p-2" />
+                <p className="text-center text-xs text-muted-foreground">
+                  Scan to access
+                </p>
+              </CardContent>
+            </Card>
           </div>
           <div className="bg-muted/50 min-h-[400px] flex-1 rounded-xl p-4">
             <h2 className="text-lg font-semibold mb-4">Todo List</h2>
