@@ -9,3 +9,13 @@ directory = "./.output/public"
 
 [observability]
 enabled = true
+
+[vars]
+# Public vars - safe to commit
+VITE_CONVEX_URL = "https://outstanding-bison-162.convex.cloud"
+
+# Secret vars - add via: wrangler secret put <KEY>
+# TWILIO_ACCOUNT_SID
+# TWILIO_AUTH_TOKEN
+# TWILIO_PHONE_NUMBER
+# GEMINI_API_KEY

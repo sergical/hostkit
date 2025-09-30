@@ -15,6 +15,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { TodoList } from '@/components/TodoListServer'
+import { CallManager } from '@/components/CallManager'
 import { Toaster } from 'sonner'
 
 export const Route = createFileRoute('/_authed/dashboard')({
@@ -47,16 +48,9 @@ function DashboardComponent() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl flex items-center justify-center">
-              <span className="text-muted-foreground">Analytics</span>
-            </div>
-            <div className="bg-muted/50 aspect-video rounded-xl flex items-center justify-center">
-              <span className="text-muted-foreground">Reports</span>
-            </div>
-            <div className="bg-muted/50 aspect-video rounded-xl flex items-center justify-center">
-              <span className="text-muted-foreground">Metrics</span>
-            </div>
+          <div className="bg-muted/50 rounded-xl p-4">
+            <h2 className="text-lg font-semibold mb-4">Voice Calls</h2>
+            <CallManager />
           </div>
           <div className="bg-muted/50 min-h-[400px] flex-1 rounded-xl p-4">
             <h2 className="text-lg font-semibold mb-4">Todo List</h2>

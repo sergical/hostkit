@@ -17,4 +17,16 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index('userId', ['userId']),
+
+  calls: defineTable({
+    callSid: v.string(),
+    phoneNumber: v.string(),
+    direction: v.union(v.literal('inbound'), v.literal('outbound')),
+    status: v.string(),
+    duration: v.optional(v.number()),
+    transcript: v.optional(v.string()),
+    userId: v.optional(v.id('users')),
+  })
+    .index('by_callSid', ['callSid'])
+    .index('by_userId', ['userId']),
 })
