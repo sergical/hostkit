@@ -100,6 +100,8 @@ wss.on('connection', async (ws) => {
   let streamSid = ''
   let audioChunkCount = 0
   let geminiResponseCount = 0
+  let phoneNumber = ''
+  let eventId = ''
 
   // Handle Twilio messages
   ws.on('message', async (message) => {
@@ -110,17 +112,37 @@ wss.on('connection', async (ws) => {
         case 'start':
           streamSid = data.start.streamSid
           console.log('[TWILIO] ✅ Stream started! CallSid:', data.start.callSid, 'StreamSid:', streamSid)
+          console.log('[TWILIO] Start data:', JSON.stringify(data.start, null, 2))
 
           // NOW start Gemini session after we have streamSid
           console.log('[GEMINI] Starting live session...')
 
           // Get event info from Convex
-          const phoneNumber = data.start.customParameters?.To || data.start.to
-          console.log('[INFO] Fetching event for phone:', phoneNumber)
+          phoneNumber = data.start.customParameters?.phoneNumber
+          eventId = data.start.customParameters?.eventId
+          console.log('[INFO] Phone:', phoneNumber, 'EventId:', eventId)
 
-          const convexUrl = process.env.VITE_CONVEX_URL || 'https://outstanding-bison-162.convex.cloud'
-          const eventResponse = await fetch(`${convexUrl}/event-for-phone?phoneNumber=${encodeURIComponent(phoneNumber)}`)
-          const eventInfo = await eventResponse.json()
+          if (!phoneNumber) {
+            console.log('[ERROR] No phone number in custom parameters')
+            ws.close()
+            return
+          }
+
+          const convexSiteUrl = process.env.VITE_CONVEX_SITE_URL || 'https://outstanding-bison-162.convex.site'
+          const eventResponse = await fetch(`${convexSiteUrl}/event-for-phone?phoneNumber=${encodeURIComponent(phoneNumber)}`)
+
+          console.log('[DEBUG] Event response status:', eventResponse.status)
+          const responseText = await eventResponse.text()
+          console.log('[DEBUG] Event response body:', responseText)
+
+          let eventInfo
+          try {
+            eventInfo = JSON.parse(responseText)
+          } catch (e) {
+            console.log('[ERROR] Failed to parse event response:', e)
+            ws.close()
+            return
+          }
 
           if (!eventInfo || eventInfo.error) {
             console.log('[ERROR] No event found for phone:', phoneNumber)
@@ -136,6 +158,7 @@ wss.on('connection', async (ws) => {
             model: 'gemini-2.5-flash-native-audio-preview-09-2025',
             config: {
               responseModalities: [Modality.AUDIO],
+              automaticFunctionCalling: true,
               systemInstruction: `You are calling ${eventInfo.attendeeName} to confirm attendance for an event.
 
 Event Details:
@@ -146,9 +169,11 @@ Event Details:
 Your task:
 1. Greet ${eventInfo.attendeeName} warmly by name
 2. Ask if they are still interested in attending "${eventInfo.eventName}" on ${eventDate}
-3. If they say NO or want to cancel, use the remove_attendee tool with phoneNumber="${phoneNumber}" and eventId="${eventInfo.eventId}"
+3. IMPORTANT: If they say NO or want to cancel, you MUST immediately call the remove_attendee function BEFORE responding
 4. If they say YES, thank them and confirm their attendance
 5. Keep the conversation brief and natural (under 30 seconds)
+
+CRITICAL: Always call the remove_attendee function when someone wants to cancel. Do not just say you will remove them - actually call the function.
 
 Be conversational, friendly, and understanding.`,
               tools: [
@@ -156,20 +181,10 @@ Be conversational, friendly, and understanding.`,
                   functionDeclarations: [
                     {
                       name: 'remove_attendee',
-                      description: 'Remove an attendee from the event when they confirm they do not want to attend',
+                      description: 'Remove the current attendee from the event when they confirm they do not want to attend',
                       parameters: {
                         type: 'object',
-                        properties: {
-                          phoneNumber: {
-                            type: 'string',
-                            description: 'The phone number of the attendee to remove',
-                          },
-                          eventId: {
-                            type: 'string',
-                            description: 'The ID of the event',
-                          },
-                        },
-                        required: ['phoneNumber', 'eventId'],
+                        properties: {},
                       },
                     },
                   ],
@@ -187,30 +202,29 @@ Be conversational, friendly, and understanding.`,
 
                   for (const fnCall of message.toolCall.functionCalls) {
                     if (fnCall.name === 'remove_attendee') {
-                      console.log('[TOOL] Removing attendee:', fnCall.args)
+                      console.log('[TOOL] Removing attendee:', { phoneNumber, eventId })
 
                       try {
-                        // Call Convex HTTP endpoint
-                        const convexUrl = process.env.VITE_CONVEX_URL || 'https://outstanding-bison-162.convex.cloud'
-                        const response = await fetch(`${convexUrl}/remove-attendee`, {
+                        // Call Convex HTTP endpoint with context values
+                        const convexSiteUrl = process.env.VITE_CONVEX_SITE_URL || 'https://outstanding-bison-162.convex.site'
+                        const response = await fetch(`${convexSiteUrl}/remove-attendee`, {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify(fnCall.args),
+                          body: JSON.stringify({ phoneNumber, eventId }),
                         })
 
                         const result = await response.json()
                         console.log('[TOOL] Result:', result)
 
                         // Send tool response back to Gemini
-                        session.send({
-                          toolResponse: {
-                            functionResponses: [
-                              {
-                                name: fnCall.name,
-                                response: result,
-                              },
-                            ],
-                          },
+                        session.sendToolResponse({
+                          functionResponses: [
+                            {
+                              id: fnCall.id,
+                              name: fnCall.name,
+                              response: result,
+                            },
+                          ],
                         })
                       } catch (error) {
                         console.error('[TOOL] Error:', error)
@@ -237,10 +251,6 @@ Be conversational, friendly, and understanding.`,
                     },
                   }
 
-                  if (geminiResponseCount === 1 || geminiResponseCount % 20 === 0) {
-                    console.log(`[GEMINI→USER] Sent ${geminiResponseCount} audio chunks (${mulawBase64.length} bytes)`)
-                  }
-
                   ws.send(JSON.stringify(twilioMessage))
                 }
               },
@@ -260,8 +270,6 @@ Be conversational, friendly, and understanding.`,
             return
           }
 
-          audioChunkCount++
-
           // Convert audio to 16kHz PCM
           const pcmBase64 = convertTwilioToGemini(data.media.payload)
 
@@ -272,10 +280,6 @@ Be conversational, friendly, and understanding.`,
               mimeType: 'audio/pcm;rate=16000',
             },
           })
-
-          if (audioChunkCount % 100 === 0) {
-            console.log('[USER→GEMINI] Sent', audioChunkCount, 'audio chunks')
-          }
           break
 
         case 'stop':

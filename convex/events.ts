@@ -83,6 +83,7 @@ export const getEventWithAttendees = query({
       attendees: v.array(
         v.object({
           _id: v.id('attendees'),
+          eventId: v.id('events'),
           phoneNumber: v.string(),
           name: v.string(),
           status: v.union(v.literal('confirmed'), v.literal('cancelled'), v.literal('pending')),

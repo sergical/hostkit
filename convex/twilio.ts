@@ -29,7 +29,10 @@ export const initiateCall = action({
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
     <Connect>
-        <Stream url="${streamUrl}" />
+        <Stream url="${streamUrl}">
+            <Parameter name="phoneNumber" value="${args.to}" />
+            ${args.eventId ? `<Parameter name="eventId" value="${args.eventId}" />` : ''}
+        </Stream>
     </Connect>
 </Response>`
 
