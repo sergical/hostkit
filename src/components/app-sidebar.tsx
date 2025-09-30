@@ -10,6 +10,7 @@ import {
   FileText,
   Calendar,
   Zap,
+  Mic,
 } from 'lucide-react'
 
 import { NavMain } from '@/components/nav-main'
@@ -99,6 +100,11 @@ const data = {
           url: '/team/invitations',
         },
       ],
+    },
+    {
+      title: 'Talk to Gemini',
+      url: '/gemini-chat',
+      icon: Mic,
     },
     {
       title: 'Settings',

@@ -17,6 +17,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as InboundEventBotRouteImport } from './routes/inbound-event-bot'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedGeminiChatRouteImport } from './routes/_authed/gemini-chat'
 import { Route as AuthedEventsRouteImport } from './routes/_authed/events'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
 import { Route as AuthedEventsEventIdRouteImport } from './routes/_authed/events.$eventId'
@@ -53,6 +54,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedGeminiChatRoute = AuthedGeminiChatRouteImport.update({
+  id: '/gemini-chat',
+  path: '/gemini-chat',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedEventsRoute = AuthedEventsRouteImport.update({
   id: '/events',
   path: '/events',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/events': typeof AuthedEventsRouteWithChildren
+  '/gemini-chat': typeof AuthedGeminiChatRoute
   '/events/$eventId': typeof AuthedEventsEventIdRoute
 }
 export interface FileRoutesByTo {
@@ -92,6 +99,7 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/dashboard': typeof AuthedDashboardRoute
   '/events': typeof AuthedEventsRouteWithChildren
+  '/gemini-chat': typeof AuthedGeminiChatRoute
   '/events/$eventId': typeof AuthedEventsEventIdRoute
 }
 export interface FileRoutesById {
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
   '/_authed/events': typeof AuthedEventsRouteWithChildren
+  '/_authed/gemini-chat': typeof AuthedGeminiChatRoute
   '/_authed/events/$eventId': typeof AuthedEventsEventIdRoute
 }
 export interface FileRouteTypes {
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/dashboard'
     | '/events'
+    | '/gemini-chat'
     | '/events/$eventId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/dashboard'
     | '/events'
+    | '/gemini-chat'
     | '/events/$eventId'
   id:
     | '__root__'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/_authed/dashboard'
     | '/_authed/events'
+    | '/_authed/gemini-chat'
     | '/_authed/events/$eventId'
   fileRoutesById: FileRoutesById
 }
@@ -214,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/gemini-chat': {
+      id: '/_authed/gemini-chat'
+      path: '/gemini-chat'
+      fullPath: '/gemini-chat'
+      preLoaderRoute: typeof AuthedGeminiChatRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/events': {
       id: '/_authed/events'
       path: '/events'
@@ -264,11 +283,13 @@ const AuthedEventsRouteWithChildren = AuthedEventsRoute._addFileChildren(
 interface AuthedRouteChildren {
   AuthedDashboardRoute: typeof AuthedDashboardRoute
   AuthedEventsRoute: typeof AuthedEventsRouteWithChildren
+  AuthedGeminiChatRoute: typeof AuthedGeminiChatRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedDashboardRoute: AuthedDashboardRoute,
   AuthedEventsRoute: AuthedEventsRouteWithChildren,
+  AuthedGeminiChatRoute: AuthedGeminiChatRoute,
 }
 
 const AuthedRouteWithChildren =
