@@ -20,8 +20,11 @@ import type * as emails_magicLink from "../emails/magicLink.js";
 import type * as emails_resetPassword from "../emails/resetPassword.js";
 import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_verifyOTP from "../emails/verifyOTP.js";
+import type * as events from "../events.js";
 import type * as http from "../http.js";
+import type * as seedEvents from "../seedEvents.js";
 import type * as todos from "../todos.js";
+import type * as twilio from "../twilio.js";
 
 import type {
   ApiFromModules,
@@ -50,8 +53,11 @@ declare const fullApi: ApiFromModules<{
   "emails/resetPassword": typeof emails_resetPassword;
   "emails/verifyEmail": typeof emails_verifyEmail;
   "emails/verifyOTP": typeof emails_verifyOTP;
+  events: typeof events;
   http: typeof http;
+  seedEvents: typeof seedEvents;
   todos: typeof todos;
+  twilio: typeof twilio;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

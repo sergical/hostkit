@@ -26,7 +26,24 @@ export default defineSchema({
     duration: v.optional(v.number()),
     transcript: v.optional(v.string()),
     userId: v.optional(v.id('users')),
+    eventId: v.optional(v.id('events')),
   })
     .index('by_callSid', ['callSid'])
     .index('by_userId', ['userId']),
+
+  events: defineTable({
+    name: v.string(),
+    description: v.string(),
+    date: v.number(),
+    location: v.string(),
+  }),
+
+  attendees: defineTable({
+    eventId: v.id('events'),
+    phoneNumber: v.string(),
+    name: v.string(),
+    status: v.union(v.literal('confirmed'), v.literal('cancelled'), v.literal('pending')),
+  })
+    .index('by_event', ['eventId'])
+    .index('by_phone_and_event', ['phoneNumber', 'eventId']),
 })

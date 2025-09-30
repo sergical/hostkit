@@ -3,28 +3,43 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { convexQuery } from '@convex-dev/react-query'
+import { useAction } from 'convex/react'
 import { api } from '@convex/_generated/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 
 export function CallManager() {
-  const [phoneNumber, setPhoneNumber] = useState('')
-  const [isInitiating, setIsInitiating] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState('6479844940')
 
   const { data: calls = [] } = useQuery(
     convexQuery(api.calls.listCalls, {}),
   )
 
+  const initiateCall = useAction(api.twilio.initiateCall)
+  const [isPending, setIsPending] = useState(false)
+
   const handleInitiateCall = async () => {
     if (!phoneNumber) return
 
-    setIsInitiating(true)
+    setIsPending(true)
     try {
-      // TODO: Implement outbound call via Twilio API
-      console.log('Initiating call to:', phoneNumber)
+      const result = await initiateCall({
+        to: phoneNumber,
+      })
+
+      if (result.success) {
+        toast.success(`Calling ${phoneNumber}...`)
+        setPhoneNumber('')
+      } else {
+        toast.error(result.error || 'Failed to initiate call')
+      }
+    } catch (error) {
+      toast.error('Failed to initiate call')
+      console.error(error)
     } finally {
-      setIsInitiating(false)
+      setIsPending(false)
     }
   }
 
@@ -39,8 +54,8 @@ export function CallManager() {
           onChange={(e) => setPhoneNumber(e.target.value)}
           className="flex-1"
         />
-        <Button onClick={handleInitiateCall} disabled={isInitiating || !phoneNumber}>
-          {isInitiating ? 'Calling...' : 'Call'}
+        <Button onClick={handleInitiateCall} disabled={isPending || !phoneNumber}>
+          {isPending ? 'Calling...' : 'Call'}
         </Button>
       </div>
 

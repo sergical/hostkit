@@ -17,7 +17,8 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
-import { ServerRoute as ApiVoiceSplatServerRouteImport } from './routes/api/voice/$'
+import { ServerRoute as ApiVoiceStreamServerRouteImport } from './routes/api/voice/stream'
+import { ServerRoute as ApiVoiceIncomingServerRouteImport } from './routes/api/voice/incoming'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -51,9 +52,14 @@ const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
 } as any)
-const ApiVoiceSplatServerRoute = ApiVoiceSplatServerRouteImport.update({
-  id: '/api/voice/$',
-  path: '/api/voice/$',
+const ApiVoiceStreamServerRoute = ApiVoiceStreamServerRouteImport.update({
+  id: '/api/voice/stream',
+  path: '/api/voice/stream',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiVoiceIncomingServerRoute = ApiVoiceIncomingServerRouteImport.update({
+  id: '/api/voice/incoming',
+  path: '/api/voice/incoming',
   getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
@@ -109,28 +115,32 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/voice/$': typeof ApiVoiceSplatServerRoute
+  '/api/voice/incoming': typeof ApiVoiceIncomingServerRoute
+  '/api/voice/stream': typeof ApiVoiceStreamServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/voice/$': typeof ApiVoiceSplatServerRoute
+  '/api/voice/incoming': typeof ApiVoiceIncomingServerRoute
+  '/api/voice/stream': typeof ApiVoiceStreamServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/voice/$': typeof ApiVoiceSplatServerRoute
+  '/api/voice/incoming': typeof ApiVoiceIncomingServerRoute
+  '/api/voice/stream': typeof ApiVoiceStreamServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/auth/$' | '/api/voice/$'
+  fullPaths: '/api/auth/$' | '/api/voice/incoming' | '/api/voice/stream'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/auth/$' | '/api/voice/$'
-  id: '__root__' | '/api/auth/$' | '/api/voice/$'
+  to: '/api/auth/$' | '/api/voice/incoming' | '/api/voice/stream'
+  id: '__root__' | '/api/auth/$' | '/api/voice/incoming' | '/api/voice/stream'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
-  ApiVoiceSplatServerRoute: typeof ApiVoiceSplatServerRoute
+  ApiVoiceIncomingServerRoute: typeof ApiVoiceIncomingServerRoute
+  ApiVoiceStreamServerRoute: typeof ApiVoiceStreamServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -181,11 +191,18 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
-    '/api/voice/$': {
-      id: '/api/voice/$'
-      path: '/api/voice/$'
-      fullPath: '/api/voice/$'
-      preLoaderRoute: typeof ApiVoiceSplatServerRouteImport
+    '/api/voice/stream': {
+      id: '/api/voice/stream'
+      path: '/api/voice/stream'
+      fullPath: '/api/voice/stream'
+      preLoaderRoute: typeof ApiVoiceStreamServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/voice/incoming': {
+      id: '/api/voice/incoming'
+      path: '/api/voice/incoming'
+      fullPath: '/api/voice/incoming'
+      preLoaderRoute: typeof ApiVoiceIncomingServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
     '/api/auth/$': {
@@ -221,7 +238,8 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
-  ApiVoiceSplatServerRoute: ApiVoiceSplatServerRoute,
+  ApiVoiceIncomingServerRoute: ApiVoiceIncomingServerRoute,
+  ApiVoiceStreamServerRoute: ApiVoiceStreamServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)
