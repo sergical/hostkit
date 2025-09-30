@@ -4,13 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a full-stack web application built with:
+**HostKit** is an AI-powered event attendance confirmation system that uses voice calls to automatically confirm attendee participation.
+
+### Tech Stack
 - **Frontend**: TanStack Start (React framework) with TanStack Router
 - **Backend**: Convex (real-time database and backend-as-a-service)
+- **Voice System**: Twilio + Google Gemini Live API (native audio)
+- **Audio Server**: Express.js WebSocket server (port 3001)
 - **Authentication**: Better Auth integrated with Convex
 - **Deployment Target**: Cloudflare Workers
 - **Styling**: Tailwind CSS v4 with Radix UI components
 - **Monitoring**: Sentry for error tracking
+
+### How It Works
+
+1. **Event Management**: Organizers create events and add attendees (name + phone number) in the dashboard
+2. **Call Initiation**: Click "Call" button → Convex action initiates Twilio outbound call with custom parameters (phoneNumber, eventId)
+3. **Audio Bridging**: Twilio streams audio via WebSocket to Express server (`twilio-server/server.js`)
+4. **Audio Conversion**:
+   - Inbound: Twilio μ-law 8kHz → PCM 16kHz for Gemini
+   - Outbound: Gemini PCM 24kHz → μ-law 8kHz for Twilio
+5. **AI Conversation**: Gemini Live greets attendee by name, asks about attendance confirmation
+6. **Tool Calling**: Based on response:
+   - YES → calls `confirm_attendee` tool → updates status to "confirmed"
+   - NO → calls `remove_attendee` tool → updates status to "cancelled"
+7. **Database Update**: Express server calls Convex HTTP endpoints to update attendee status
+8. **Real-time UI**: Dashboard shows live status updates via Convex subscriptions
 
 ## Commands
 
@@ -19,6 +38,10 @@ This is a full-stack web application built with:
 npm run dev                # Start dev server (web + database)
 npm run dev:web           # Start Vite dev server on port 3000
 npm run dev:db            # Start Convex dev backend
+
+# Twilio Server (separate terminal)
+cd twilio-server
+node server.js            # Start audio bridging server on port 3001
 ```
 
 ### Building & Deployment
@@ -140,5 +163,33 @@ Backend code lives in `convex/`:
 
 Required in `.env.local`:
 - `VITE_CONVEX_URL` - Convex deployment URL
+- `VITE_CONVEX_SITE_URL` - Convex site URL for HTTP endpoints (e.g., `https://outstanding-bison-162.convex.site`)
 - `CONVEX_SITE_URL` - Site URL for auth callbacks
+- `TWILIO_ACCOUNT_SID` - Twilio account SID
+- `TWILIO_AUTH_TOKEN` - Twilio auth token
+- `TWILIO_PHONE_NUMBER` - Twilio phone number (e.g., `+1234567890`)
+- `TWILIO_STREAM_URL` - WebSocket URL for Twilio MediaStreams (e.g., `wss://hostk.it.com/stream`)
+- `GEMINI_API_KEY` - Google AI API key for Gemini Live
 - `SENTRY_AUTH_TOKEN` - For sourcemap uploads (optional)
+
+## Key Files
+
+### Twilio + Gemini Integration
+- `twilio-server/server.js` - Express WebSocket server bridging Twilio and Gemini
+  - Audio format conversion (μ-law ↔ PCM)
+  - Gemini Live session management
+  - Tool call handling (confirm/remove attendee)
+- `convex/twilio.ts` - Convex action to initiate outbound calls
+- `convex/http.ts` - HTTP endpoints for tool calls (`/confirm-attendee`, `/remove-attendee`)
+
+### Database Schema
+- `convex/schema.ts` - Events, attendees, calls tables
+- `convex/events.ts` - Mutations/queries for event and attendee management
+- `convex/seedEvents.ts` - Seed script to populate test data
+
+### UI Components
+- `src/components/CallManager.tsx` - Main dashboard component
+  - Event list with attendees
+  - Add attendee form
+  - Call initiation buttons
+  - Reset to pending buttons
