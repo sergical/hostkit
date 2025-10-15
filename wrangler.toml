@@ -12,7 +12,7 @@ enabled = true
 
 [vars]
 # Public vars - safe to commit
-VITE_CONVEX_URL = "https://outstanding-bison-162.convex.cloud"
+VITE_CONVEX_URL = "https://merry-trout-359.convex.cloud"
 
 # Secret vars - add via: wrangler secret put <KEY>
 # TWILIO_ACCOUNT_SID
