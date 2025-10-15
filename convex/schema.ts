@@ -46,4 +46,58 @@ export default defineSchema({
   })
     .index('by_event', ['eventId'])
     .index('by_phone_and_event', ['phoneNumber', 'eventId']),
+
+  // Quiz Game Tables
+  quizzes: defineTable({
+    title: v.string(),
+    description: v.string(),
+    createdBy: v.id('users'),
+    createdAt: v.number(),
+  }).index('by_user', ['createdBy']),
+
+  questions: defineTable({
+    quizId: v.id('quizzes'),
+    questionText: v.string(),
+    options: v.array(v.string()),
+    correctAnswerIndex: v.number(),
+    order: v.number(),
+    timeLimit: v.number(), // in seconds
+  }).index('by_quiz_and_order', ['quizId', 'order']),
+
+  games: defineTable({
+    quizId: v.id('quizzes'),
+    hostId: v.id('users'),
+    status: v.union(
+      v.literal('waiting'),
+      v.literal('in_progress'),
+      v.literal('finished')
+    ),
+    currentQuestionIndex: v.number(),
+    createdAt: v.number(),
+    startedAt: v.optional(v.number()),
+    finishedAt: v.optional(v.number()),
+    code: v.string(), // 6-character game code
+  })
+    .index('by_code', ['code'])
+    .index('by_host', ['hostId'])
+    .index('by_status', ['status']),
+
+  players: defineTable({
+    gameId: v.id('games'),
+    nickname: v.string(),
+    score: v.number(),
+    joinedAt: v.number(),
+  }).index('by_game_and_score', ['gameId', 'score']),
+
+  answers: defineTable({
+    gameId: v.id('games'),
+    playerId: v.id('players'),
+    questionIndex: v.number(),
+    answerIndex: v.number(),
+    isCorrect: v.boolean(),
+    timeToAnswer: v.number(), // in milliseconds
+    answeredAt: v.number(),
+  })
+    .index('by_game_and_question', ['gameId', 'questionIndex'])
+    .index('by_player_and_question', ['playerId', 'questionIndex']),
 })

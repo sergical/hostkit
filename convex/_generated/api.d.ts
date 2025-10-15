@@ -22,7 +22,9 @@ import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_verifyOTP from "../emails/verifyOTP.js";
 import type * as events from "../events.js";
 import type * as http from "../http.js";
+import type * as quiz from "../quiz.js";
 import type * as seedEvents from "../seedEvents.js";
+import type * as seedQuiz from "../seedQuiz.js";
 import type * as todos from "../todos.js";
 import type * as twilio from "../twilio.js";
 
@@ -55,7 +57,9 @@ declare const fullApi: ApiFromModules<{
   "emails/verifyOTP": typeof emails_verifyOTP;
   events: typeof events;
   http: typeof http;
+  quiz: typeof quiz;
   seedEvents: typeof seedEvents;
+  seedQuiz: typeof seedQuiz;
   todos: typeof todos;
   twilio: typeof twilio;
 }>;

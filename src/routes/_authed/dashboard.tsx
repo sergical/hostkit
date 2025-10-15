@@ -14,7 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-import { CallManager } from '@/components/CallManager'
+import { QuizManager } from '@/components/QuizManager'
 import { Toaster } from 'sonner'
 
 export const Route = createFileRoute('/_authed/dashboard')({
@@ -47,7 +47,7 @@ function DashboardComponent() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <CallManager />
+          <QuizManager />
         </div>
       </SidebarInset>
       <Toaster />

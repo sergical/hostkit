@@ -17,5 +17,10 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "iconLibrary": "lucide"
+  "iconLibrary": "lucide",
+  "registries": {
+    "@reui": "https://reui.io/r/{name}.json",
+    "@blocks": "https://blocks.so/r/{name}.json",
+    "@kibo-ui": "https://www.kibo-ui.com/r/{name}.json"
+  }
 }

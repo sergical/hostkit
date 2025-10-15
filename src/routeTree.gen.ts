@@ -16,7 +16,11 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GameJoinRouteImport } from './routes/game/join'
 import { Route as AuthedDashboardRouteImport } from './routes/_authed/dashboard'
+import { Route as GameGameIdResultsRouteImport } from './routes/game/$gameId.results'
+import { Route as GameGameIdPlayRouteImport } from './routes/game/$gameId.play'
+import { Route as GameGameIdLobbyRouteImport } from './routes/game/$gameId.lobby'
 import { ServerRoute as ApiVoiceStreamServerRouteImport } from './routes/api/voice/stream'
 import { ServerRoute as ApiVoiceIncomingServerRouteImport } from './routes/api/voice/incoming'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
@@ -47,10 +51,30 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GameJoinRoute = GameJoinRouteImport.update({
+  id: '/game/join',
+  path: '/game/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedDashboardRoute = AuthedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthedRoute,
+} as any)
+const GameGameIdResultsRoute = GameGameIdResultsRouteImport.update({
+  id: '/game/$gameId/results',
+  path: '/game/$gameId/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameGameIdPlayRoute = GameGameIdPlayRouteImport.update({
+  id: '/game/$gameId/play',
+  path: '/game/$gameId/play',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameGameIdLobbyRoute = GameGameIdLobbyRouteImport.update({
+  id: '/game/$gameId/lobby',
+  path: '/game/$gameId/lobby',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiVoiceStreamServerRoute = ApiVoiceStreamServerRouteImport.update({
   id: '/api/voice/stream',
@@ -74,6 +98,10 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/game/join': typeof GameJoinRoute
+  '/game/$gameId/lobby': typeof GameGameIdLobbyRoute
+  '/game/$gameId/play': typeof GameGameIdPlayRoute
+  '/game/$gameId/results': typeof GameGameIdResultsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -81,6 +109,10 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/dashboard': typeof AuthedDashboardRoute
+  '/game/join': typeof GameJoinRoute
+  '/game/$gameId/lobby': typeof GameGameIdLobbyRoute
+  '/game/$gameId/play': typeof GameGameIdPlayRoute
+  '/game/$gameId/results': typeof GameGameIdResultsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -90,12 +122,34 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/_authed/dashboard': typeof AuthedDashboardRoute
+  '/game/join': typeof GameJoinRoute
+  '/game/$gameId/lobby': typeof GameGameIdLobbyRoute
+  '/game/$gameId/play': typeof GameGameIdPlayRoute
+  '/game/$gameId/results': typeof GameGameIdResultsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/reset-password' | '/sign-in' | '/sign-up' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/dashboard'
+    | '/game/join'
+    | '/game/$gameId/lobby'
+    | '/game/$gameId/play'
+    | '/game/$gameId/results'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/reset-password' | '/sign-in' | '/sign-up' | '/dashboard'
+  to:
+    | '/'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/dashboard'
+    | '/game/join'
+    | '/game/$gameId/lobby'
+    | '/game/$gameId/play'
+    | '/game/$gameId/results'
   id:
     | '__root__'
     | '/'
@@ -104,6 +158,10 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/_authed/dashboard'
+    | '/game/join'
+    | '/game/$gameId/lobby'
+    | '/game/$gameId/play'
+    | '/game/$gameId/results'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -112,6 +170,10 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  GameJoinRoute: typeof GameJoinRoute
+  GameGameIdLobbyRoute: typeof GameGameIdLobbyRoute
+  GameGameIdPlayRoute: typeof GameGameIdPlayRoute
+  GameGameIdResultsRoute: typeof GameGameIdResultsRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -180,12 +242,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/game/join': {
+      id: '/game/join'
+      path: '/game/join'
+      fullPath: '/game/join'
+      preLoaderRoute: typeof GameJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed/dashboard': {
       id: '/_authed/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthedDashboardRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/game/$gameId/results': {
+      id: '/game/$gameId/results'
+      path: '/game/$gameId/results'
+      fullPath: '/game/$gameId/results'
+      preLoaderRoute: typeof GameGameIdResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game/$gameId/play': {
+      id: '/game/$gameId/play'
+      path: '/game/$gameId/play'
+      fullPath: '/game/$gameId/play'
+      preLoaderRoute: typeof GameGameIdPlayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game/$gameId/lobby': {
+      id: '/game/$gameId/lobby'
+      path: '/game/$gameId/lobby'
+      fullPath: '/game/$gameId/lobby'
+      preLoaderRoute: typeof GameGameIdLobbyRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -232,6 +322,10 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  GameJoinRoute: GameJoinRoute,
+  GameGameIdLobbyRoute: GameGameIdLobbyRoute,
+  GameGameIdPlayRoute: GameGameIdPlayRoute,
+  GameGameIdResultsRoute: GameGameIdResultsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
