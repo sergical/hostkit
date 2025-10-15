@@ -112,6 +112,7 @@ export const createAuth = (
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       },
     },
+    trustedOrigins: [siteUrl ?? 'http://localhost:3000'],
     user: {
       deleteUser: {
         enabled: true,

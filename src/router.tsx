@@ -17,7 +17,8 @@ export function createRouter() {
     console.error('missing envar CONVEX_URL')
   }
   const convex = new ConvexReactClient(CONVEX_URL, {
-    expectAuth: true,
+    // Set to false to allow unauthenticated players to join games
+    expectAuth: false,
   })
   const convexQueryClient = new ConvexQueryClient(convex)
 

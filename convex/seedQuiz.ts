@@ -45,31 +45,31 @@ export const seedConvexQuiz = mutation({
         questionText: 'What programming language does Convex use for backend functions?',
         options: ['Python', 'TypeScript/JavaScript', 'Go', 'Rust'],
         correctAnswerIndex: 1,
-        timeLimit: 20,
+        timeLimit: 10,
       },
       {
         questionText: 'Which Convex function type is used to modify data?',
         options: ['Query', 'Mutation', 'Action', 'Loader'],
         correctAnswerIndex: 1,
-        timeLimit: 15,
+        timeLimit: 10,
       },
       {
         questionText: 'What does Convex provide out of the box for real-time updates?',
         options: ['WebSockets', 'Reactive queries', 'Polling', 'Server-Sent Events'],
         correctAnswerIndex: 1,
-        timeLimit: 20,
+        timeLimit: 10,
       },
       {
         questionText: 'What is the Convex database built on?',
         options: ['PostgreSQL', 'MongoDB', 'A custom reactive database', 'SQLite'],
         correctAnswerIndex: 2,
-        timeLimit: 20,
+        timeLimit: 10,
       },
       {
         questionText: 'Which function type can call external APIs?',
         options: ['Query', 'Mutation', 'Action', 'All of the above'],
         correctAnswerIndex: 2,
-        timeLimit: 18,
+        timeLimit: 10,
       },
       {
         questionText: 'What does Convex automatically handle for you?',
@@ -80,7 +80,7 @@ export const seedConvexQuiz = mutation({
           'All of the above',
         ],
         correctAnswerIndex: 3,
-        timeLimit: 20,
+        timeLimit: 10,
       },
       {
         questionText: 'How does Convex handle authentication?',
@@ -91,7 +91,7 @@ export const seedConvexQuiz = mutation({
           'No auth support',
         ],
         correctAnswerIndex: 2,
-        timeLimit: 20,
+        timeLimit: 10,
       },
       {
         questionText: 'What is the benefit of Convex queries being reactive?',
@@ -102,7 +102,7 @@ export const seedConvexQuiz = mutation({
           'Smaller bundle size',
         ],
         correctAnswerIndex: 1,
-        timeLimit: 20,
+        timeLimit: 10,
       },
       {
         questionText: 'How does Convex handle file storage?',
@@ -113,7 +113,7 @@ export const seedConvexQuiz = mutation({
           'Local file system',
         ],
         correctAnswerIndex: 2,
-        timeLimit: 18,
+        timeLimit: 10,
       },
       {
         questionText: 'What makes Convex different from traditional databases?',
@@ -124,7 +124,7 @@ export const seedConvexQuiz = mutation({
           'No type safety',
         ],
         correctAnswerIndex: 1,
-        timeLimit: 20,
+        timeLimit: 10,
       },
     ]
 

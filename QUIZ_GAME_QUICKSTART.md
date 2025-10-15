@@ -51,6 +51,8 @@ For each player:
 5. You'll see the lobby with other players
 
 > **Tip**: Open 2-3 incognito windows to simulate multiple players!
+>
+> **Note**: Players do NOT need to sign in! They join anonymously with just a nickname.
 
 ### 6. Start and Play the Game
 
