@@ -6,7 +6,7 @@ import { Button } from './ui/button'
 import { Card, CardContent } from './ui/card'
 import { Progress } from './ui/progress'
 import { Badge } from './ui/badge'
-import { Loader2, Trophy, Clock } from 'lucide-react'
+import { Loader2, Clock } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 
@@ -88,7 +88,7 @@ export function GamePlay({ gameId, playerId, isHost }: GamePlayProps) {
         timeToAnswer,
       })
       setLastResult(result)
-      setShowResults(true)
+      // Don't show results immediately - wait for timer to expire
     } catch (error) {
       console.error('Failed to submit answer:', error)
     } finally {
@@ -182,8 +182,8 @@ export function GamePlay({ gameId, playerId, isHost }: GamePlayProps) {
             })}
           </div>
 
-          {/* Answer feedback */}
-          {showResults && lastResult && (
+          {/* Answer feedback - only shown when timer expires */}
+          {timeLeft === 0 && lastResult && (
             <div className="mt-6 p-4 rounded-lg bg-muted text-center">
               {lastResult.isCorrect ? (
                 <div className="space-y-2">
@@ -201,44 +201,22 @@ export function GamePlay({ gameId, playerId, isHost }: GamePlayProps) {
             </div>
           )}
 
-          {showResults && !lastResult && timeLeft === 0 && !hasAnswered && (
+          {timeLeft === 0 && !lastResult && !hasAnswered && (
             <div className="mt-6 p-4 rounded-lg bg-muted text-center">
-              <p className="text-lg text-muted-foreground">Time's up!</p>
+              <p className="text-lg text-muted-foreground">Time's up! You didn't answer.</p>
+            </div>
+          )}
+          
+          {hasAnswered && timeLeft > 0 && (
+            <div className="mt-6 p-4 rounded-lg bg-muted text-center">
+              <p className="text-lg text-muted-foreground">Answer submitted! Waiting for time to expire...</p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Leaderboard */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Trophy className="h-5 w-5 text-yellow-500" />
-            <h3 className="font-semibold text-lg">Leaderboard</h3>
-          </div>
-          <div className="space-y-2">
-            {players
-              .slice()
-              .sort((a, b) => b.score - a.score)
-              .slice(0, 5)
-              .map((player, index) => (
-                <div
-                  key={player._id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-lg w-6">{index + 1}.</span>
-                    <span className="font-medium">{player.nickname}</span>
-                  </div>
-                  <span className="font-bold">{player.score}</span>
-                </div>
-              ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Host controls */}
-      {isHost && showResults && (
+      {isHost && timeLeft === 0 && (
         <div className="flex justify-center">
           <Button size="lg" onClick={handleNextQuestion} className="text-lg px-8">
             {gameData.game.currentQuestionIndex + 1 >= gameData.totalQuestions

@@ -59,7 +59,7 @@ export function GameLobby({ gameId, isHost }: GameLobbyProps) {
     )
   }
 
-  const shareUrl = `${window.location.origin}/game/join?code=${gameData.game.code}`
+  const shareUrl = `https://local.hostk.it.com/game/join?code=${gameData.game.code}`
 
   return (
     <div className="container max-w-4xl mx-auto p-6 space-y-6">

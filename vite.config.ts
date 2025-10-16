@@ -14,6 +14,7 @@ export default defineConfig({
       target: 'cloudflare-module',
       customViteReactPlugin: true,
     }),
+    
     react(),
     sentryVitePlugin({
       org: 'sergtech',
@@ -26,6 +27,9 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    allowedHosts: ['local.hostk.it.com'],
+  },
   build: {
     sourcemap: true,
   },
